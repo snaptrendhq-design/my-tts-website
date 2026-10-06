@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SnapTrendHQ AI TTS</title>
+</head>
+<body>
+
+<h1>AI Text To Speech</h1>
+
+<textarea id="text" rows="6" cols="40"></textarea>
+
+<br><br>
+
+<button onclick="speakText()">Speak</button>
+
+<script>
+function speakText() {
+  const text = document.getElementById("text").value;
+
+  const speech = new SpeechSynthesisUtterance(text);
+
+  speech.lang = "en-US";
+
+  speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+</html>
