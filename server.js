@@ -1,6 +1,5 @@
 import express from "express";
 import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -9,31 +8,45 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
-app.post("/generate", async (req, res) => {
+app.post("/tts", async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, voiceId } = req.body;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: text,
-    });
+    const response = await fetch(
+      "https://api.cartesia.ai/tts/bytes",
+      {
+        method: "POST",
+        headers: {
+          "Cartesia-Version": "2026-08-14",
+          "X-API-Key": process.env.CARTESIA_API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model_id: "sonic-3.6",
+          transcript: text,
+          voice: voiceId,
+          output_format: {
+            container: "wav",
+            encoding: "pcm_s16le",
+            sample_rate: 44100
+          }
+        })
+      }
+    );
 
-    res.json({
-      output: response.text,
-    });
+    const audioBuffer =
+      Buffer.from(await response.arrayBuffer());
 
-  } catch (error) {
-    console.error(error);
+    res.setHeader("Content-Type", "audio/wav");
+    res.send(audioBuffer);
+
+  } catch (err) {
     res.status(500).json({
-      error: error.message,
+      error: err.message
     });
   }
 });
 
 app.listen(3000, () => {
-  console.log("Server running on port 3000");
+  console.log("Server running");
 });
