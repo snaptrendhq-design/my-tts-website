@@ -1,28 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SnapTrendHQ AI TTS</title>
+<title>SnapTrendHQ AI Voice</title>
 </head>
 <body>
 
-<h1>AI Text To Speech</h1>
+<h1>Cartesia AI Voice</h1>
 
-<textarea id="text" rows="6" cols="40"></textarea>
+<textarea
+id="text"
+rows="10"
+cols="50"
+placeholder="Type text here">
+</textarea>
 
 <br><br>
 
-<button onclick="speakText()">Speak</button>
+<select id="voice">
+
+<option value="a5136bf9-224c-4d76-b823-52bd5efcffcc">
+Voice 1
+</option>
+
+<option value="4459a9a5-69d6-4680-b970-e13dc51845b6">
+Voice 2
+</option>
+
+</select>
+
+<br><br>
+
+<button onclick="generateVoice()">
+Generate Voice
+</button>
+
+<br><br>
+
+<audio id="player" controls></audio>
 
 <script>
-function speakText() {
-  const text = document.getElementById("text").value;
 
-  const speech = new SpeechSynthesisUtterance(text);
+async function generateVoice() {
 
-  speech.lang = "en-US";
+const text =
+document.getElementById("text").value;
 
-  speechSynthesis.speak(speech);
+const voiceId =
+document.getElementById("voice").value;
+
+const response =
+await fetch("/tts", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+text,
+voiceId
+})
+});
+
+const blob =
+await response.blob();
+
+const url =
+URL.createObjectURL(blob);
+
+document.getElementById(
+"player"
+).src = url;
+
 }
+
 </script>
 
 </body>
